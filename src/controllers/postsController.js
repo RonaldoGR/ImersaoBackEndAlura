@@ -1,5 +1,7 @@
-import {getTodosPosts, criarPost} from "../models/postModel.js";
+import {getTodosPosts, criarPost, atualizarPost} from "../models/postModel.js";
 import fs from "fs";
+import gerarDescricaoComGemini from "../services/geminiServices.js"
+
  
 // 1. Quando uma requisição GET é feita para o caminho /posts: 
 export async function listarPosts (req, res)  {
@@ -37,5 +39,27 @@ export async function uploadImagem(req, res) { // Exporta uma função assíncro
   } catch (error) { // Captura qualquer erro que ocorra
     console.error(error.message); // Imprime a mensagem de erro no console
     res.status(500).json({"Erro": "Falha na requisição"}); // Retorna um erro genérico com status 500
+  };
+};
+
+
+export async function atualizarNovoPost(req, res) { 
+  const id = req.params.id;
+  const urlImagem = `http://localhost:3000/upload/${id}.png`;
+  try {
+    const imageBuffer = fs.readFileSync(`uploads/${id}.png`);
+    const descricao = await gerarDescricaoComGemini(imageBuffer);
+
+    const postAtualizado = {
+      imgUrl: urlImagem,
+      descricao: descricao,
+      alt: req.body.alt
+    };
+
+    const postCriado = await atualizarPost(id, postAtualizado); 
+    res.status(200).json(postCriado);
+  } catch (error) { 
+    console.error(error.message); 
+    res.status(500).json({"Erro": "Falha na requisição"}); 
   }
-}
+};

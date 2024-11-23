@@ -3,6 +3,7 @@ import routes from "./src/routes/postRoutes.js";
 
 // Cria uma instância do Express, que será o núcleo da nossa aplicação web.
 const app = express();
+app.use(express.static("uploads")) // servir arquivos estáticos
 routes(app);
 // porta 3000 fixa específica utilizada para servidor local
 // Inicia o servidor na porta 3000 e exibe uma mensagem no console quando o servidor estiver ouvindo as requisições.
